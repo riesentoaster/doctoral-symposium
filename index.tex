@@ -123,25 +123,64 @@
 
 \begin{figure}
     \begin{lstlisting}
-VBq-"7.6arK w;zu%6$K>%OTV"ryD*
+(P1): VBq-"7.6arK w;zu%6$K>%OTV"ryD*
     \end{lstlisting}
     \begin{lstlisting}
-&& float += % " ( ; == [
+(P2): && float += % " ( ; == [
     \end{lstlisting}
     \begin{lstlisting}
-int main() { return i; }
+(P3): int main() { return i; }
     \end{lstlisting}
     \begin{lstlisting}
-int main() { return 0; }
+(P4): int main() { return 0; }
     \end{lstlisting}
-    \caption{Inputs for a C compiler that get rejected by the lexer, are syntactically and semantically invalid, and are fully valid, respectively.}
-    \Description{Inputs for a C compiler that get rejected by the lexer, are syntactically and semantically invalid, and are fully valid, respectively.}
+    \caption{C programs that are lexically \texttt{(P1)}, syntactically \texttt{(P2)} and semantically \texttt{(P3)} invalid and fully valid \texttt{(P4)}.}
+    \Description{Examples of C programs that are lexically, syntactically and semantically invalid and fully valid.}
     \label{fig:c_examples}
 \end{figure}
+\todo{number programs in fig}
 
-Automated test generators such as fuzzers have been proven to be highly effective at finding software errors along these steps. However, not all test generators provide inputs that test the same parts of the system under test (SUT).\cite{Demystifying}
+Programs processing input typically do so in several distinct steps, with the programs in Figure~\ref{fig:c_examples} passing increasingly more of these steps:
 
-Program behavior under a certain input shows similarities observed in a wide range of programs. Program input is typically provided as unstructured data (such as a binary blob containing data for an image). This input is first parsed into data structures that can then be processed by the program's business logic. For an input to be fully processed by a SUT, the linearized data in this input needs to adhere to an expected input structure, i. e. it needs to be parseable and pass all input validation checks.
+\begin{enumerate}
+    \item \textbf{Lexing}: Unstructured input is split into an unstructured list of tokens. \texttt{(P1)} will be rejected by the lexer of a C compiler.
+    \item \textbf{Syntactic Parsing and Checks}: If the input is syntactically valid, it is parsed into structures. While \texttt{(P2)} consists of exclusively valid tokens, they do not appear in the correct structure to be parsed into an abstract syntax tree and are therefore rejected by the parser of a compiler.
+    \item \textbf{Semantic Checks}: These parsed structures are tested on their semantic meaning. \texttt{(P3)} can be parsed, but is still not valid — the variable \texttt{i} is not defined.
+    \item \textbf{Business Logic}: Finally, the input is processed by a program's inner logic, e.g. translated into an executable.
+\end{enumerate}
+
+\begin{figure}[b]
+    \includegraphics[width=0.8\linewidth]{bush}
+    \caption{Bush representing the input space of a program, where increasing height represents increasing correctness of a certain input}
+    \Description{Drawing of a bush with a ladder and overlayed numbered ellipses. The bush represents the input space of a system under test, with increasing height in the bush representing increasing correctness of a certain input.}
+    \label{fig:bush}
+\end{figure}
+
+My observation is that test generators generally produce inputs that test only a subset of the steps above, depending on their internal model of the input structure. Imagine the input space of a program expecting highly structured input as a bush, with bugs represented by berries spread throughout, as shown in Figure~\ref{fig:bush}.
+
+Purely random input generation, like the first fuzzers\cite{UNIX} is unlikely to test anything but the lexing stage, it is therefore similar to reaching only the very bottom of the bush (I).
+
+In a next step, coverage-guided fuzzing was proposed, which is able to incrementally find inputs that reach deeper into the program with random mutation\cite{AFL}, and thus reaches further up the tree (II). These approaches were extended with instrumentation and logic that allow them to produce increasingly correct inputs\cite{RedQueen,FrameShift}, thus extending their reach once more (III).
+
+By manually providing the test generator with a model of the target input structure, an analyst can help a fuzzer produce increasingly correct inputs. This is the equivalent of helping a test generator climb on the first step of a ladder.
+
+One widely used approach is to provide a test generator with a context-free grammar, based on which it can produce inputs that will by construction not be rejected by the parser and thus reach further into the program (IV). From there, they can produce inputs that validate their inner model\cite{GrammarMutation,Nautilus} to reach further down (V), or attempt to pass additional semantic checks\cite{Autarkie} (VI).
+
+Recent advancements provide a generic model for input testers to receive a complete model of the PUT input structure\cite{Fandango}, which allows testing the business logic (VII).
+
+
+\cleardoublepage
+
+
+
+
+
+distribution of bugs like the distribution of berries in a bush, with berries higher up in the bush representing more correct inputs, as shown in Figure~\ref{fig:bush}. Historically, a set of fundamentally different approaches was proposed. These produce inputs that have varying distributions of input correctness and interestingness and therefore test different parts of the program and check for different kinds of software errors. The following section provides a categorization of approaches along with the program parts they test, as indicated in Figure~\ref{fig:bush}. The exact extent of the figurative reach of each fuzzer remains unknown; this figure is not to scale, including the amount of overlap.
+
+
+
+
+
 
 Different programs have vastly different requirements for their inputs: zip is designed to process any data during compression, while compilers need to be very strict about the input they allow. Generally, one can distinguish between three steps in input validation, correlating to the examples given in Figure~\ref{fig:c_examples}. They are increasingly less likely to be fulfilled by random data:
 
@@ -156,11 +195,11 @@ Various approaches have been suggested to produce inputs that adhere to some or 
 In this work, I present the following contributions:
 \begin{enumerate}
     \item I propose two alternative ways of \textit{evaluating test generators} by examining the inputs they produce for \textit{correctness} and \textit{interestingness}, along with proposals for various approaches to measuring them.
-    \item I argue why I suspect that significant portions of the input space of SUTs requiring highly structured inputs remain untested, along with results from initial experiments confirming my suspicion.
+    \item I argue why I suspect that significant portions of the input space of PUTs requiring highly structured inputs remain untested, along with results from initial experiments confirming my suspicion.
     \item Finally, I provide three suggested approaches to closing this gap.
 \end{enumerate}
 
-I explore how to evaluate suspected limitations in these approaches for testing SUTs expecting highly structured inputs, along with potential solutions.
+I explore how to evaluate suspected limitations in these approaches for testing PUTs expecting highly structured inputs, along with potential solutions.
 
 \todo{Talk about prior research somewhere, even if unpublished?}
 
@@ -168,22 +207,22 @@ I explore how to evaluate suspected limitations in these approaches for testing 
 
 \label{sec:measurements}
 
-Evaluating test generators can be done in multiple, orthogonal ways. The most common measurement is the code coverage reached when executing a certain input on an instrumented implementation of the SUT. But while code coverage is comparatively easy to measure due to the availability of instrumentation passes in popular compilers\cite{gcov,SanCov}\todo{citation format of these} and binary-only fuzzing tools\cite{LibAFLQEMU}, it has two fundamental limitations: (1) It assigns equal weight to all branches and (2) assumes any value covering a new branch is equally interesting.
+Evaluating test generators can be done in multiple, orthogonal ways. The most common measurement is the code coverage reached when executing a certain input on an instrumented implementation of the PUT. But while code coverage is comparatively easy to measure due to the availability of instrumentation passes in popular compilers\cite{gcov,SanCov}\todo{citation format of these} and binary-only fuzzing tools\cite{LibAFLQEMU}, it has two fundamental limitations: (1) It assigns equal weight to all branches and (2) assumes any value covering a new branch is equally interesting.
 
 While code coverage is often evaluated dynamically during a fuzzing campaign to aid the fuzzer in progressing through a program, this has to be distinguished from using code coverage as a technique to evaluate fuzzer performance.
 
 \subsection{Input Correctness}
 
-Limitation (1) in evaluating a fuzzer's performance means that fuzzers that reach far into the SUT but only provide valid inputs may receive the same score as a fuzzer that tests all error paths in the initial input validation steps of a program. Alternatively, I propose evaluating fuzzers for \textit{input correctness}. The correctness of an input with regards to a SUT can be evaluated in two ways:
+Limitation (1) in evaluating a fuzzer's performance means that fuzzers that reach far into the PUT but only provide valid inputs may receive the same score as a fuzzer that tests all error paths in the initial input validation steps of a program. Alternatively, I propose evaluating fuzzers for \textit{input correctness}. The correctness of an input with regards to a PUT can be evaluated in two ways:
 
 \begin{enumerate}
-    \item First, one can test inputs on an implementation of a SUT, measuring the ratio of accepted to rejected inputs. This can further be refined by annotating or instrumenting the code to record the step at which a certain input is rejected. This can be achieved with one of the following:
+    \item First, one can test inputs on an implementation of a PUT, measuring the ratio of accepted to rejected inputs. This can further be refined by annotating or instrumenting the code to record the step at which a certain input is rejected. This can be achieved with one of the following:
           \begin{enumerate}
               \item Manual annotations of steps along the path through the program, similar to \cite{FuzzFactory,IJON}
               \item Selective coverage instrumentation of entire program parts as a very coarse measurement\cite{Zest}
               \item I further propose the following heuristic: Based on a diverse set of (fuzzer-produced) inputs, \textit{instrument the edges executed by all valid inputs}.
           \end{enumerate}
-    \item Alternatively, inputs can be evaluated against an abstract specification of the language expected by a SUT. Such specifications are usually given in natural language, but recent works have explored how to express such specification in a structured way, as a combination of a context-free grammar and additional constraints over nodes in this grammar\cite{Fandango}. Evaluating the correctness against such a specification may be done in different steps:
+    \item Alternatively, inputs can be evaluated against an abstract specification of the language expected by a PUT. Such specifications are usually given in natural language, but recent works have explored how to express such specification in a structured way, as a combination of a context-free grammar and additional constraints over nodes in this grammar\cite{Fandango}. Evaluating the correctness against such a specification may be done in different steps:
           \begin{enumerate}
               \item For inputs that cannot be parsed with the provided grammar, existing literature provides algorithm to measure how close to valid the input is.\cite{DistanceInitial, DistanceLessThanCubic}
               \item For inputs that are parsed, the ratio of fulfilled to violated constraints can be used to assess the correctness of an input.
@@ -192,7 +231,7 @@ Limitation (1) in evaluating a fuzzer's performance means that fuzzers that reac
 
 \subsection{Input Interestingness}
 
-Not all inputs are equally interesting, even if they are all fully correct. According to the testing principle of equivalence classes, incrementing a byte is unlikely to trigger a bug. This is of course unless this new byte is at the edge of legality for the SUT, for example by changing this byte so that it is no longer in a valid range. This is known as boundary testing: If a requirement allows values between 5 and 100, the likelihood of discovering a problem is higher with values 4, 5, 6, 99, 100, and 101 compared to values between and outside. Special values such as 0, -1, or the maximum possible number may further be interesting.
+Not all inputs are equally interesting, even if they are all fully correct. According to the testing principle of equivalence classes, incrementing a byte is unlikely to trigger a bug. This is of course unless this new byte is at the edge of legality for the PUT, for example by changing this byte so that it is no longer in a valid range. This is known as boundary testing: If a requirement allows values between 5 and 100, the likelihood of discovering a problem is higher with values 4, 5, 6, 99, 100, and 101 compared to values between and outside. Special values such as 0, -1, or the maximum possible number may further be interesting.
 
 Previously, it was non-trivial to evaluate how close an input part is to such a constraint boundary. With the availability of formal and machine-readable specifications, such as described above, this now becomes possible. An input (part) is more interesting, the closer to the boundaries provided by the specification it is. This can be applied to semantic constraints, but also syntactic structure: If a node can be repeated an arbitrary number of times, testing 0 repetitions, 1 repetition and a large number of repetitions is interesting. This can be reinterpreted as syntactic boundary testing.
 
@@ -214,13 +253,13 @@ For clang, Nautilus does not seem to be able to generate test inputs that fully 
 
 One can categorize most fuzzers along the correctness of the inputs they provide. Imagine the distribution of bugs like the distribution of berries in a bush, with berries higher up in the bush representing more correct inputs, as shown in Figure~\ref{fig:bush}. Historically, a set of fundamentally different approaches was proposed. These produce inputs that have varying distributions of input correctness and interestingness and therefore test different parts of the program and check for different kinds of software errors. The following section provides a categorization of approaches along with the program parts they test, as indicated in Figure~\ref{fig:bush}. The exact extent of the figurative reach of each fuzzer remains unknown; this figure is not to scale, including the amount of overlap.
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.7\linewidth]{bush}
-    \caption{Bush representing the input space of a program, where increasing height represents increasing correctness of a certain input}
-    \Description{Drawing of a bush with a ladder and overlayed numbered ellipses. The bush represents the input space of a system under test, with increasing height in the bush representing increasing correctness of a certain input.}
-    \label{fig:bush}
-\end{figure}
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=0.7\linewidth]{bush}
+%     \caption{Bush representing the input space of a program, where increasing height represents increasing correctness of a certain input}
+%     \Description{Drawing of a bush with a ladder and overlayed numbered ellipses. The bush represents the input space of a system under test, with increasing height in the bush representing increasing correctness of a certain input.}
+%     \label{fig:bush}
+% \end{figure}
 
 The initial approach was using fully random data\cite{UNIX}. As discussed above, this will only test the outermost input validation, equivalent to the very low-hanging fruit (as represented by the ellipsis labeled I).
 
@@ -228,7 +267,7 @@ The next major step was the introduction of naïve mutational coverage-guided fu
 
 Some of these limitations were mitigated to a point by extending CGF with additional instrumentation. By logging the values input parts are compared to, the fuzzer can mutate the input again to fix these parts and therefore pass the checks \cite{RedQueen}. This further allows CGF to pass simple checksums. More recent advancements allow CGF to automatically fix length fields based on sudden coverage drop-offs\cite{FrameShift}. These improvements allow the fuzzer to produce more correct inputs and reach further up the tree of bugs (III).
 
-However, certain structure sill cannot be learned by fuzzers from feedback, which is why\todo{cite} grammar fuzzers were introduced\cite{Nautilus}. These start from a different place, producing inputs that pass at least the lexing and parsing steps of a SUT\footnote{At least in principle; unless constraint validation is intermixed with parsing}. By providing the grammar, the analyst "helps" the fuzzer onto the first step of a ladder on the bush where it reaches left and right (IV).
+However, certain structure sill cannot be learned by fuzzers from feedback, which is why\todo{cite} grammar fuzzers were introduced\cite{Nautilus}. These start from a different place, producing inputs that pass at least the lexing and parsing steps of a PUT\footnote{At least in principle; unless constraint validation is intermixed with parsing}. By providing the grammar, the analyst "helps" the fuzzer onto the first step of a ladder on the bush where it reaches left and right (IV).
 
 From this next step on the ladder, fuzzers can reach further down by producing inputs that do not (fully) adhere to the grammar, by mutating the grammar or the trees after production (V)\cite{GrammarMutation,Nautilus}. There have been initial steps towards extending grammar-based fuzzers to reach further up, for example by using the same instrumentation on value comparisons as described above (VI)\cite{Autarkie}.
 
@@ -261,7 +300,7 @@ Finally, I propose multiple approaches of how to design future test generators t
 
 % Automated test generation, such as fuzzing, has proven to be an effective strategy for finding bugs and vulnerabilities in a wide range of software and hardware. In their initial work on fuzzing, \citeauthor{UNIX} used entirely unstructured random data\cite{UNIX}. And while this approach lead to a significant list of bugs, for any program expecting its input to adhere to a certain structure and performing trivial input validation, it is highly unlikely to execute any of the program logic besides these outermost input validation checks. And while these are extensively tested by such input generation techniques, most logic and therefore potential bugs are shielded from ever being executed and thus tested.
 
-% To increase the parts of a certain system under test (SUT) that are actually evaluated by a test generator system, this system needs to ensure that the structure of the inputs it produces adheres (at least partially) to the structure expected by the SUT.
+% To increase the parts of a certain system under test (PUT) that are actually evaluated by a test generator system, this system needs to ensure that the structure of the inputs it produces adheres (at least partially) to the structure expected by the PUT.
 
 
 % \section{Related Work: Categorization of Approaches}
@@ -293,7 +332,7 @@ Finally, I propose multiple approaches of how to design future test generators t
 % \end{itemize}
 % \subsection{Systematically Exploring Structure: Symbolic Execution}
 % \begin{itemize}
-%   \item In principle: Tests all parts of the SUT, by construction and effectively (assurances about completeness)
+%   \item In principle: Tests all parts of the PUT, by construction and effectively (assurances about completeness)
 %   \item In practice: Doesn't scale, limitations on environment interaction etc.
 %   \item Concolic testing as a middle ground, still significant limitations
 % \end{itemize}
