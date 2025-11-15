@@ -1,4 +1,4 @@
-\documentclass[sigconf,authordraft]{acmart}
+\documentclass[sigconf,review]{acmart}
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
 \AtBeginDocument{%
@@ -47,11 +47,13 @@
 %% used to denote shared contribution to the research.
 \author{Valentin Huber}
 \email{valentin.huber@cispa.de}
-\orcid{1234-5678-9012}
+\orcid{0009-0002-9869-4583}
 \affiliation{%
     \institution{CISPA Helmholtz Center for Information Security}
-    \city{}
+    \city{Saarbrücken}
     \country{Germany}
+    % \\ Year 1 out of expected 4
+    % \\ Supervised by Prof. Dr. Andreas Zeller
 }
 
 %%
@@ -78,37 +80,32 @@
 \begin{CCSXML}
     <ccs2012>
     <concept>
-    <concept_id>00000000.0000000.0000000</concept_id>
-    <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
+    <concept_id>10011007.10011074.10011099.10011102.10011103</concept_id>
+    <concept_desc>Software and its engineering~Software testing and debugging</concept_desc>
     <concept_significance>500</concept_significance>
     </concept>
     <concept>
-    <concept_id>00000000.00000000.00000000</concept_id>
-    <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
+    <concept_id>10003752.10003766.10003771</concept_id>
+    <concept_desc>Theory of computation~Grammars and context-free languages</concept_desc>
     <concept_significance>300</concept_significance>
     </concept>
     <concept>
-    <concept_id>00000000.00000000.00000000</concept_id>
-    <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
-    <concept_significance>100</concept_significance>
-    </concept>
-    <concept>
-    <concept_id>00000000.00000000.00000000</concept_id>
-    <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
-    <concept_significance>100</concept_significance>
+    <concept_id>10011007.10010940.10010992.10010998.10011001</concept_id>
+    <concept_desc>Software and its engineering~Dynamic analysis</concept_desc>
+    <concept_significance>300</concept_significance>
     </concept>
     </ccs2012>
 \end{CCSXML}
 
-\ccsdesc[500]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc[300]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc[100]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
+\ccsdesc[500]{Software and its engineering~Software testing and debugging}
+\ccsdesc[300]{Theory of computation~Grammars and context-free languages}
+\ccsdesc[300]{Software and its engineering~Dynamic analysis}
+
 
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{Fuzzing, Grammar Fuzzing, Language Fuzzing}
+\keywords{Automated Testing, Grammars, Test Generator Evaluation}
 
 \received{20 February 2007}
 \received[revised]{12 March 2009}
@@ -119,42 +116,44 @@
 %% information and builds the first part of the formatted document.
 \maketitle
 
-\todo{change title}
+% \todo{change title}
 
-\section{Introduction}
+\subsubsection*{Doctoral Symposium Information}
+I am in year 1 out of expected 4 in my PhD, supervised by Prof. Dr. Andreas Zeller.
 
-\label{sec:introduction}
 
-\begin{figure}
+\begin{figure}[b]
     \begin{lstlisting}
-(P1): VBq-"7.6arK w;zu%6$K>%OTV"ryD*
+        (P1): VBq-"7.6arK w;zu%6$K>%OTV"ryD*
     \end{lstlisting}
     \begin{lstlisting}
-(P2): && float += % " ( ; == [
-    \end{lstlisting}
+        (P2): && float += % " ( ; == [
+        \end{lstlisting}
     \begin{lstlisting}
-(P3): int main() { return i; }
-    \end{lstlisting}
+            (P3): int main() { return i; }
+        \end{lstlisting}
     \begin{lstlisting}
-(P4): int main() { return 0; }
-    \end{lstlisting}
+            (P4): int main() { return 0; }
+        \end{lstlisting}
     \caption{C programs that are lexically \texttt{(P1)}, syntactically \texttt{(P2)} and semantically \texttt{(P3)} invalid and fully valid \texttt{(P4)}.}
     \Description{Examples of C programs that are lexically, syntactically and semantically invalid and fully valid.}
     \label{fig:c_examples}
 \end{figure}
-\todo{number programs in fig}
+% \todo{number programs in fig}
+\section{Introduction}
+\label{sec:introduction}
 
-Programs processing input typically do so in several distinct steps, with the programs in Figure~\ref{fig:c_examples} passing increasingly more of these steps:
+Programs processing input typically do so in distinct steps, with the programs in Figure~\ref{fig:c_examples} passing increasingly more of these:
 
 \begin{enumerate}
     \item \textbf{Lexing}: Unstructured input is split into an unstructured list of tokens. \texttt{(P1)} will be rejected by the lexer of a C compiler.
-    \item \textbf{Syntactic Parsing and Checks}: If the input is syntactically valid, it is parsed into structures. While \texttt{(P2)} consists of exclusively valid tokens, they do not appear in the correct structure to be parsed into an abstract syntax tree and are therefore rejected by the parser of a compiler.
-    \item \textbf{Semantic Checks}: These parsed structures are tested on their semantic meaning. \texttt{(P3)} can be parsed, but is still not valid — the variable \texttt{i} is not defined.
-    \item \textbf{Business Logic}: Finally, the input is processed by a program's inner logic, e.g. translated into an executable.
+    \item \textbf{Syntactic Parsing}: If the input is syntactically valid, it can be parsed into structures. While \texttt{(P2)} consists of exclusively valid tokens, they do not appear in the correct structure.
+    \item \textbf{Semantic Checks}: The parsed structures are then subject to tests on their semantics. \texttt{(P3)} for example can be parsed, but is invalid because the variable \texttt{i} is not defined.
+    \item \textbf{Business Logic}: Finally, the input is processed by a program's inner logic, e. g. translated into an executable.
 \end{enumerate}
 
 \begin{figure}[b]
-    \includegraphics[width=0.8\linewidth]{bush}
+    \includegraphics[width=0.75\linewidth]{bush}
     \caption{Bush representing the input space of a program, where increasing height represents increasing correctness of a certain input}
     \Description{Drawing of a bush with a ladder and overlayed numbered ellipses. The bush represents the input space of a system under test, with increasing height in the bush representing increasing correctness of a certain input.}
     \label{fig:bush}
@@ -162,26 +161,28 @@ Programs processing input typically do so in several distinct steps, with the pr
 
 My observation is that test generators generally produce inputs that test only a subset of the steps above, depending on their internal model of the input structure. Some of my previous work\cite{FTZ,coreutils} has explored this by building purpose-built fuzzers that ensure (partial) correctness of inputs.
 
-Imagine the input space of a program expecting highly structured input as a bush, with bugs represented by berries spread throughout, as shown in Figure~\ref{fig:bush}.
+\subsection{Categorization of Existing Approaches}
 
-Purely random input generation, like the first fuzzers\cite{UNIX} is unlikely to test anything but the lexing stage, it is therefore similar to reaching only the very bottom of the bush (I).
+Imagine the input space of a program as a bush, with bugs represented by berries spread throughout, as shown in Figure~\ref{fig:bush}.
+
+Purely random input generation\cite{UNIX} is unlikely to test anything but the lexing stage, it is therefore similar to reaching only the very bottom of the bush (I).
 
 In a next step, coverage-guided fuzzing was proposed, which is able to incrementally find inputs that reach deeper into the program with random mutation\cite{AFL}, and thus reaches further up the tree (II). These approaches were extended with instrumentation and logic that allow them to produce increasingly correct inputs\cite{RedQueen,FrameShift}, thus extending their reach once more (III).
 
-By manually providing the test generator with a model of the target input structure, an analyst can help a fuzzer produce increasingly correct inputs. This is the equivalent of helping a test generator climb on the first step of a ladder.
+By manually providing the test generator with a model of the target input structure, an analyst can help a test generator produce increasingly correct inputs. This is the equivalent of helping a test generator climb on the first step of a ladder.
 
 One widely used approach is to provide a test generator with a context-free grammar, based on which it can produce inputs that will by construction not be rejected by the parser and thus reach further into the program (IV). From there, they can produce inputs that validate their inner model\cite{GrammarMutation,Nautilus} to reach further down (V), or attempt to pass additional semantic checks\cite{Autarkie} (VI).
 
 Recent advancements provide a generic model for input testers to receive a complete model of the PUT input structure\cite{Fandango}, which allows testing the business logic (VII).
 
-\todo{Talk about symbex and target-specific fuzzers?}
+% \todo{Talk about symbex and target-specific fuzzers?}
 
-To my knowledge, there is no systematic evaluation of representatives of these approaches — we do not know the extent of their reach. Following this, we do not know what parts of targets remain untested, even when multiple approaches are combined.
+To the best of my knowledge, there is no systematic evaluation of representatives of these approaches — we do not know the extent of their reach. Following this, we do not know what parts of targets remain untested, even when multiple approaches are combined.
 
 Based on this insight, I present the following contributions:
 
 \begin{enumerate}
-    \item I propose two axes on which to compare the distribution of inputs from different test generators: input \textit{correctness}, and input \textit{interestingness} (Section~\ref{sec:measurements})
+    \item I propose two measurments based on which to compare the distribution of inputs from different test generators: input \textit{correctness}, and input \textit{interestingness} (Section~\ref{sec:measurements})
     \item I provide initial experiments and their results, which suggest that existing input generators are incapable of testing all program logic (Section~\ref{sec:experiments})
     \item I propose three approaches to creating input generators that fill these holes (Section~\ref{sec:my_fuzzers})
 \end{enumerate}
@@ -190,48 +191,50 @@ Based on this insight, I present the following contributions:
 
 \label{sec:measurements}
 
-Evaluating test generators can be done in multiple, orthogonal ways. The most common measurement is the code coverage reached when executing a certain input on an instrumented implementation of the PUT. While code coverage is comparatively easy to measure due to the availability of instrumentation passes in popular compilers\cite{gcov,SanCov}\todo{citation format of these} and binary-only fuzzing tools\cite{LibAFLQEMU}, it has two fundamental limitations: (1) It assigns equal weight to all branches and (2) assumes any value covering a new branch is equally interesting.
+Evaluating test generators can be done in multiple, orthogonal ways. The most common measurement is the code coverage reached when executing a certain input on an instrumented implementation of the PUT. While code coverage is comparatively easy to measure due to the availability of instrumentation passes in popular compilers\cite{SanCov} and binary-only fuzzing tools\cite{LibAFLQEMU}, it has two fundamental limitations: (1) It assigns equal weight to all branches and (2) assumes any value covering a new branch is equally interesting.
 
 \subsection{Input Correctness}
 
-Limitation (1) of using code coverage in evaluating a fuzzer's performance means that fuzzers that reach far into the PUT but only provide valid inputs may receive the same score as a fuzzer that tests all error paths in the initial input validation steps of a program. Alternatively, I propose evaluating fuzzers for \textit{input correctness}. The correctness of an input with regards to a PUT can be evaluated in two ways:
+Limitation (1) of using code coverage assign the same score to test generators that reach far into the PUT but only provide valid inputs compared to a test generators that tests all error paths in the initial input validation steps of a program. As an alternative, I propose evaluating test generators for \textit{input correctness}. The correctness of an input with regards to a PUT can be defined and measured in two ways:
 
 \begin{enumerate}
-    \item First, one can test inputs on an implementation of a PUT, measuring the ratio of accepted to rejected inputs at each stage of the input processing pipeline. This can further be refined by annotating or instrumenting the code to record the step at which a certain input is rejected. This can be achieved with one of the following:
+    \item First, one can test inputs \textbf{against an implementation} of a PUT, measuring the ratio of accepted to rejected inputs at each stage of the input processing pipeline. This can be achieved with one of the following:
           \begin{enumerate}
-              \item Manual annotations of steps along the path through the program, similar to \cite{FuzzFactory,IJON}
-              \item Selective coverage instrumentation of entire program parts as a very coarse measurement\cite{Zest}
-              \item I further propose the following heuristic: Based on a diverse set of (fuzzer-produced) inputs, \textit{instrument the edges executed by all valid inputs}.
+              \item Manual annotations of steps, similar to \cite{FuzzFactory,IJON}
+              \item I further propose the following heuristic: Based on a diverse set of inputs, \textit{instrument the edges executed by all valid inputs}.
           \end{enumerate}
-    \item Alternatively, inputs can be evaluated against an abstract specification of the language expected by a PUT. Such specifications are usually given in natural language. Recent works have explored how to express such specification in a structured way, as a combination of a context-free grammar and additional constraints over nodes in this grammar\cite{Fandango}. Evaluating the correctness against such a specification may be done in different steps:
+    \item Alternatively, inputs can be evaluated \textbf{against an abstract specification} of the language expected by a PUT. Such specifications are usually given in natural language. Recent works have explored how to express such specifications in a structured way, as a combination of a context-free grammar and additional constraints over nodes in this grammar\cite{Fandango}. Evaluating the correctness against specification may be done in different steps:
           \begin{enumerate}
-              \item For inputs that cannot be parsed with the provided grammar, existing literature provides algorithm to measure how close to valid the input is.\cite{DistanceInitial, DistanceLessThanCubic}
-              \item For inputs that are parsed, the ratio of fulfilled to violated constraints can be used to assess the correctness of an input.
+              \item For inputs that cannot be parsed, existing literature provides algorithms to measure the closeness of an input to a context-free grammar\cite{DistanceLessThanCubic}.
+              \item For grammar-valid inputs, the ratio of fulfilled to violated constraints is used.
           \end{enumerate}
 \end{enumerate}
 
 \subsection{Input Interestingness}
 
-Not all inputs are equally interesting, even if they are all fully correct, or are processed by the exact same instructions (as described in Limitation (2)). Assume a constraint that checks whether a person is an adult. According to the principle of equivalence classes, mutating their age to random values, say from $27$ to $43$, is unlikely to trigger a new bug. Changing it to values near the boundaries of equivalence classes like $18$ or $19$ is a more promising strategy to discover bugs in edge cases, such as off-by-one errors. Alternatively, one can mutate an input to a generally interesting value, like $0$, $-1$, or $2^{16}$\cite{AFL}\todo{AFL or AFL++?}.
+Not all inputs are equally interesting, even if they are all fully correct, or are all processed by the exact same instructions (as described in Limitation (2)). Assume a constraint checking whether a person is over 18. According to the principle of equivalence classes, mutating their age to random values, say from $27$ to $43$, is unlikely to trigger a new bug. Changing it to values near the boundaries of equivalence classes, in this case $18$ or $19$ is a more promising strategy to discover edge case bugs, such as off-by-one errors. Based on this insight, I define \textit{Input interestingness} as the distance of an input to equivalence class boundaries.
 
-Previously, it was non-trivial to evaluate how close an input part is to such a constraint boundary. With the availability of formal and machine-readable specifications, such as described above, this now becomes possible. An input (part) is more interesting the closer to the boundaries provided by the specification it is. This can be applied to semantic constraints, but also syntactic structure: If a node can be repeated an arbitrary number of times, testing 0 repetitions, 1 repetition and a large number of repetitions is more interesting. This can be reinterpreted as syntactic boundary testing.
+Previous work proposed mutating input parts to contain generally interesting values, such as $0$, $-1$, or $2^{16}$\cite{AFL}. However, the lack of approaches to specify input correctness fully meant that evaluating distance of an input to equivalence class boundaries was limited by an analyst's ability to manually annotating select boundaries\cite{IJON}. With the advent of abstract full input specifications\cite{Fandango}, one can now test this automatically:
 
-An alternative approach to incentivize a fuzzer to produce more interesting inputs is to instrument comparison instructions on parts of the input in a way that reward the fuzzer for inputs that achieve smaller differences between the two values that are compared. This approach is limited by the ability of the instrumentation of the fuzzer to distinguish between comparisons that represent closeness to equivalence class boundaries, as opposed to comparisons that are independent of the input or do not represent boundaries. Absent an automatic heuristic, one could use manual annotation for selected comparisons\cite{IJON}.
+\begin{enumerate}
+    \item \textbf{Semantic Interestingness}: Inputs are more interesting if they are closer to boundaries of constraints, as described in the example above.
+    \item \textbf{Syntactic Boundaries}: If an input part can be repeated an arbitrary number of times, repeating it 0, 1, or 999999 times is more interesting.
+\end{enumerate}
 
 \section{Evaluating Existing Test Generators}
 \label{sec:experiments}
 
 Section~\ref{sec:introduction} introduces potential limitations of existing input generators. To evaluate this claim, I test representatives from a subset of the proposed categories against the C compiler \texttt{clang}. I evaluate the different approaches according to \textit{input correctness} as measured through manual annotation of additional instrumentation in the target.
 
-Table~\ref{fig:results} presents the ratios of inputs generated by the evaluated approaches that reach a certain step during program execution. Approach (IV) is represented by a pure grammar-based fuzzer. For (V), outputs from the grammar fuzzer are used both unchanged and binary mutated. (VI) is represented by a coverage-guided grammar fuzzer. All representatives were run twice, once with only self-created seeds, and once with an additional set of 10 high-quality manually written seeds using different aspects of the target language.
+Table~\ref{fig:results} presents the ratios of inputs generated by the evaluated approaches that reach a certain step during program execution. Approach (IV) is represented by a pure grammar-based test generator. For (V), outputs from the grammar test generator are used both unchanged and binary mutated. (VI) is represented by a coverage-guided grammar test generator. All representatives were run twice, once with only self-created seeds, and once with an additional set of 10 high-quality manually written seeds using different aspects of the target language.
 
-The results confirm the suspected inability of the presented approaches to test program parts past the semantic checks. They do however have significant limitations and only partially adhere to general evaluation best practices\cite{SOKFuzzingEvaluation}: I am only testing against one implementation, for one target requiring highly structured inputs. I am evaluating only on \textit{input correctness}, in coarse-grained steps, and not against a specification. Additionally, the examples were only run once for 12 hours each.
+The results confirm the suspected inability of the presented approaches to test program parts past the semantic checks. They do however have significant limitations and only partially adhere to general evaluation best practices\cite{SOKFuzzingEvaluation}: I am only testing against one implementation, for one target requiring highly structured inputs. I am evaluating only on \textit{input correctness}, in coarse-grained steps, and not against a specification. Finally, the examples were only run once for 12 hours each.
 
 In future work, I want to expand on these experiments by extending the number and kind of targets, measurements, and evaluation robustness. I further want to test additional approaches and multiple implementations in each; along with test generators purpose-built for a specific target.
 
 \begin{table}
     \centering
-    \caption{Ratio of inputs rejected by program steps and total coverage across approaches in clang. Approaches marked with \textbf{*} receive an initial corpus of valid C programs.}
+    \caption{Ratio of inputs rejected by program steps and total coverage across approach categories in clang. Approaches marked with \textbf{*} receive an initial corpus of valid C programs.}
     \label{fig:results}
     \begin{tabular}{|l|c|c|c|c|c|c|}
         \hline
@@ -251,26 +254,31 @@ In future work, I want to expand on these experiments by extending the number an
 
 The results in Section~\ref{sec:experiments} suggest that current approaches for test generators are limited — large parts of clang remain untested. Section~\ref{sec:introduction} provides a conceptual explanation for these limitations. Building on top of these, I present three approaches that may extend the parts of a PUT that are effectively tested by automated test generators:
 \begin{enumerate}
-    \item \textbf{Reach down from the top}: Similarly to out-of-grammar fuzzing, I want to explore out-of-language fuzzing, where constraints of a full specification are iteratively and deliberately violated, while the remaining constraints are still fulfilled. This approach could further be improved by out-of-grammar construction of the inputs that are evaluated for constraints, giving the fuzzer theoretical reach from the top of the ladder all the way to the ground.
-    \item \textbf{Incremental steps towards the top}: Writing fully correct specifications for tools like Fandango is considerable work due to a current lack of automated specification generation. However, providing a few simple constraints to an existing grammar may be enough to allow a fuzzer to reach code it was previously unable to test. This by design will additionally produce inputs that do not match the full specification, thus leading to a similar effect as approach (1).
-    \item \textbf{Targeted testing}: Due to the availability of tools that able to use full input specifications, I would like to explore fuzzers producing inputs that reach higher interestingness in their test cases by steering input generation towards boundaries of both the input semantics (i.e. the constraints) and the syntax (the structure).
+    \item \textbf{Reach down from the top}: Similarly to out-of-grammar test generation, I want to explore out-of-language generation, where constraints of a full specification are iteratively and deliberately violated, while the remaining constraints are still fulfilled. This approach could further be improved by out-of-grammar construction of the inputs that are evaluated for constraints, giving the test generator theoretical reach from the top of the ladder all the way to the ground.
+    \item \textbf{Incremental steps towards the top}: Writing fully correct specifications for tools like Fandango is considerable work due to a current lack of automated specification generation. However, providing a few simple constraints to an existing grammar may be enough to allow a test generator to reach code it was previously unable to test. This by design will additionally produce inputs that do not match the full specification, thus leading to a similar effect as approach (1).
+    \item \textbf{Targeted testing}: Due to the availability of tools that able to use full input specifications, I would like to explore test generator producing inputs that reach higher interestingness in their test cases by steering input generation towards boundaries of both the input semantics (i.e. the constraints) and the syntax (the structure).
 \end{enumerate}
 
 \section{Conclusion}
 
-In this work I discuss the limitations of existing test generations to test programs that require highly structured inputs. Specifically, I present two measurements to evaluate different test generation approaches. \textit{Input correctness} measures either how far an input gets along the input processing pipeline of a target program, or to what extent it fulfills analyist-given lexical, syntactic and semantic constraints. \textit{Input interestingness} measures how close an input is to equivalenc class boundaries.
+In this work I present two measurements to evaluate different test generation approaches. \textit{Input correctness} measures either how far an input gets along the input processing pipeline of a target program, or to what extent it fulfills analyist-given lexical, syntactic and semantic constraints. \textit{Input interestingness} refers to the distance between an input an equivalence class boundaries.
 
 I then present results of an initial experiment showing that current generic test generators fail at testing significant parts of a C compiler, as measured by \textit{input correctness}. Finally, I propose three approaches to creating test generators that are able to to test previously untestable program parts. To achieve improved \textit{input correctness}, systematically violate semantic and syntactic rules of an input specification or extend current structure-aware test generators based on context-free grammars with additional, incomplete semantic constraints. To produce inputs with increased \textit{input interestingness}, prioritize inputs closer to equivalence class boundaries.
 
+% \section{Doctoral Symposium Information}
+% \begin{itemize}
+%     \item I am in year 1 out of expected 4.
+%     \item I am supervised by Prof. Dr. Andreas Zeller.
+% \end{itemize}
 
 %%
 %% The acknowledgments section is defined using the "acks" environment
 %% (and NOT an unnumbered section). This ensures the proper
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
-% \begin{acks}
-%     To Robert, for the bagels and explaining CMYK and color spaces.
-% \end{acks}
+\begin{acks}
+    This work is funded by the European Union (ERC S3, 101093186). Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Research Council. Neither the European Union nor the granting authority can be held responsible for them.
+\end{acks}
 
 %%
 %% The next two lines define the bibliography style to be used, and
