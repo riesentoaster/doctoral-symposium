@@ -69,7 +69,7 @@
 \begin{abstract}
     Current test generators are limited in the inputs they produce. This leads to an imbalance in the program parts tested, with significant program parts receiving insufficient attention, particularly with programs expecting inputs that are highly structured. In this work, I propose two measurements to evaluate different approaches and find which parts of programs are under-tested. \textit{Input correctness} provides a level to which an input satisfies the expected structure, measured either against an implementation or specification. \textit{Input interestingness} checks the distance to equivalence class boundaries.
 
-    I present the distribution of \textit{input correctness} from an initial evaluation of different approaches on a C compiler, suggesting significant limitations of existing approaches. I further propose three approaches to closing the gap in testing all input parts.
+    I present the distribution of \textit{input correctness} from an initial evaluation on a \texttt{clang}, indicating that approaches designed to provide structurally valid inputs are unable to test program logic behind the input validation steps. I finally propose three approaches to closing this gap by producing inputs that are both \textit{correct} and \textit{interesting}.
 \end{abstract}
 
 %%
